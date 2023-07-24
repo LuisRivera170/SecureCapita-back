@@ -1,13 +1,28 @@
--- COMMENTS
+####################################################################
+###                                                             ####
+### Author: Luis Rivera                                         ####
+### Date: July 03, 2023                                         ####
+### Version: 1.0                                                ####
+###                                                             ####
+####################################################################
+
+/*
+ * --- General Rules ---
+ * Use underscore_names instead of camelCase
+ * Table names should be plural
+ * Don't use ambiguous column names
+ * Name foreign key columns the same as the columns they refer to
+ * Use caps for all SQL queries
+ */
 
 CREATE SCHEMA IF NOT EXISTS securecapita;
 
 SET NAMES 'UTF8MB4';
 SET TIME_ZONE = 'America/Mexico_City';
 
-DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE Users
+CREATE TABLE users
 (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     first_name   VARCHAR(50) NOT NULL,
@@ -26,29 +41,31 @@ CREATE TABLE Users
     CONSTRAINT UQ_Users_Email UNIQUE(email)
 );
 
-DROP TABLE IF EXISTS Roles;
+DROP TABLE IF EXISTS roles;
 
-CREATE TABLE Roles
+CREATE TABLE roles
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(50) NOT NULL,
-    permission VARCHAR(50) NOT NULL,
+    permission VARCHAR(255) NOT NULL,
     CONSTRAINT UQ_Roles_Name UNIQUE(name)
 );
 
-DROP TABLE IF EXISTS UserRoles;
+DROP TABLE IF EXISTS user_roles;
 
-CREATE TABLE UserRoles
+CREATE TABLE user_roles
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id    BIGINT UNSIGNED NOT NULL,
     role_id    BIGINT UNSIGNED NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (role_id) REFERENCES Roles(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT UQ_UserRoles_User_Id UNIQUE(user_id)
 );
 
-CREATE TABLE Events
+DROP TABLE IF EXISTS events;
+
+CREATE TABLE events
 (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     type        VARCHAR(50) NOT NULL CHECK(type IN ('LOGIN_ATTEMPT', 'LOGIN_ATTEMPT_FAILURE')),
@@ -56,9 +73,9 @@ CREATE TABLE Events
     CONSTRAINT UQ_Events_Type UNIQUE(type)
 );
 
-DROP TABLE IF EXISTS UserEvents;
+DROP TABLE IF EXISTS user_events;
 
-CREATE TABLE UserEvents
+CREATE TABLE user_events
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id    BIGINT UNSIGNED NOT NULL,
@@ -66,44 +83,44 @@ CREATE TABLE UserEvents
     device     VARCHAR(100) DEFAULT NULL,
     ip_address VARCHAR(100) DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (event_id) REFERENCES Events(id) ON DELETE RESTRICT ON UPDATE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-DROP TABLE IF EXISTS AccountVerifications;
+DROP TABLE IF EXISTS account_verifications;
 
-CREATE TABLE AccountVerifications
+CREATE TABLE account_verifications
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id    BIGINT UNSIGNED NOT NULL,
     url        VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT UQ_AccountVerification_User_Id UNIQUE(user_id),
     CONSTRAINT UQ_AccountVerification_Url UNIQUE(url)
 );
 
-DROP TABLE IF EXISTS ResetPasswordVerifications;
+DROP TABLE IF EXISTS reset_password_verifications;
 
-CREATE TABLE ResetPasswordVerifications
+CREATE TABLE reset_password_verifications
 (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id         BIGINT UNSIGNED NOT NULL,
     url             VARCHAR(255) NOT NULL,
     expiration_date DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT UQ_ResetPasswordVerifications_User_Id UNIQUE(user_id),
     CONSTRAINT UQ_ResetPasswordVerifications_Url UNIQUE(url)
 );
 
-DROP TABLE IF EXISTS TwoFactorVerifications;
+DROP TABLE IF EXISTS two_factor_verifications;
 
-CREATE TABLE TwoFactorVerifications
+CREATE TABLE two_factor_verifications
 (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id         BIGINT UNSIGNED NOT NULL,
     code            VARCHAR(10) NOT NULL,
     expiration_date DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT UQ_TwoFactorVerifications_User_Id UNIQUE(user_id),
     CONSTRAINT UQ_TwoFactorVerifications_Code UNIQUE(Code)
 );
