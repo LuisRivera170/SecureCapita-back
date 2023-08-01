@@ -17,6 +17,7 @@ import java.util.Objects;
 import static com.lara.securecapita.enumeration.RoleType.ROLE_USER;
 import static com.lara.securecapita.query.RoleQuery.INSERT_ROLE_TO_USER_QUERY;
 import static com.lara.securecapita.query.RoleQuery.SELECT_ROLE_BY_NAME_QUERY;
+import static com.lara.securecapita.query.RoleQuery.SELECT_ROLE_BY_USER_ID_QUERY;
 
 @Repository
 @RequiredArgsConstructor
@@ -60,13 +61,19 @@ public class RoleRepositoryImpl implements RoleRepository<Role> {
         } catch (EmptyResultDataAccessException exception) {
             throw new ApiException("No role found by name: " + ROLE_USER.name());
         } catch (Exception exception) {
-            throw new ApiException("An error ocurred, Please try again.");
+            throw new ApiException("An error occurred, Please try again.");
         }
     }
 
     @Override
     public Role getRoleByUserId(Long userId) {
-        return null;
+        try {
+            return jdbc.queryForObject(SELECT_ROLE_BY_USER_ID_QUERY, Map.of("userId", userId), new RoleRowMapper());
+        } catch (EmptyResultDataAccessException exception) {
+            throw new ApiException("No roles found by userId: {}" + userId);
+        } catch (Exception exception) {
+            throw new ApiException("An error occurred, Please try again.");
+        }
     }
 
     @Override

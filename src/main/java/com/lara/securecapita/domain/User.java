@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
@@ -19,7 +21,10 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(NON_DEFAULT)
-public class User {
+public class User implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     @NotEmpty(message = "First name cannot be empty")

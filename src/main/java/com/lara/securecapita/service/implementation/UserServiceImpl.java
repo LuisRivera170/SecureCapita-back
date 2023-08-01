@@ -20,4 +20,10 @@ public class UserServiceImpl implements UserService {
                 .fromUser(userRepository.create(user));
     }
 
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        return UserDTOMapper
+                .fromUser(userRepository.getUserByEmail(email));
+    }
+
 }
